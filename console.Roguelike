@@ -1,0 +1,682 @@
+using Roguelike;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+namespace Roguelike
+{
+    class Hero
+    {
+        // ПЕРЕМЕННЫЕ
+        public string hero_name;
+        public double strength;
+        public double agility;
+        public double intelligence;
+        public double healthpoint;
+        public double mana;
+        public double damage;
+        public double critical;
+        public double distribute_point = 10;
+        public string classname;
+        // МЕТОДЫ
+        public void Main_Stats(out string hero_name, out double strength, out double agility, out double intelligence) // ВВОД ХАРАКТЕРИСТИК
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("Введите ваше имя герой: ");
+            Console.ForegroundColor = ConsoleColor.Red;
+            hero_name = Convert.ToString(Console.ReadLine());
+            Console.ForegroundColor = ConsoleColor.Gray;
+            start:
+            // распределение характеристик
+            Console.ForegroundColor = ConsoleColor.White;
+            enter_strengs:
+            Console.WriteLine("Расспределите {0} очков <max 6>", distribute_point);
+            // ввод силы
+            Console.WriteLine("Осталось очков {0}", distribute_point);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("Сила: ");
+            Console.ForegroundColor = ConsoleColor.Red;
+            strength = Convert.ToDouble(Console.ReadLine());
+            double inputone = distribute_point - strength;
+            Console.ForegroundColor = ConsoleColor.Gray;
+            if (strength > 6||inputone <0)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("Введите адекватное количество очков: ");
+                goto enter_strengs;
+            }
+            // ввод ловкости
+            enter_agility:
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Осталось очков {0}", inputone);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("Ловкость: ");
+            Console.ForegroundColor = ConsoleColor.Red;
+            agility = Convert.ToDouble(Console.ReadLine());
+            Console.ForegroundColor = ConsoleColor.Gray;
+            double inputtwo =inputone - agility;
+            if (inputtwo < 0 ||agility > 6)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("Введите адекватное количество очков: ");
+                goto enter_agility;
+            }
+
+            // ввод иннтелекта
+            Console.ForegroundColor = ConsoleColor.White;
+            enter_intelligence:
+            Console.WriteLine("Осталось очков {0}", inputtwo);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("Интеллект: ");
+            Console.ForegroundColor = ConsoleColor.Red;
+            intelligence = Convert.ToDouble(Console.ReadLine());
+            Console.ForegroundColor = ConsoleColor.Gray;
+            double inputthree = inputtwo - intelligence; ;
+            if (inputthree<0 || intelligence > 6)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("Введите адекватное количество очков: ");
+                goto enter_intelligence;
+            }
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Осталось очков {0}", inputthree);
+            // проверка на остаток балов
+            if (inputthree == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("Хотите ли Вы перераспределить очки? < 1. ДА / 2. НЕТ >");
+                if (inputthree > 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.White; ;
+                    Console.WriteLine("У Вас есть нераспределенные очки ");
+                }
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("> ");
+                int want_to_redistribute = Convert.ToInt32(Console.ReadLine());
+                if (want_to_redistribute == 1)
+                {
+                    Console.Clear();
+                    goto start;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Перераспределите очки нормально,спасибо за понимание");
+                goto start;
+            }
+        }
+        public void Additional_Stats(out double damage, out double critical, out double healthpoint, out double mana) // КОНВЕРТАЦИЯ
+        {
+            damage = agility * 1.5;// damage
+            critical = agility * 0.2; // crit
+            healthpoint = strength * 4; // hp
+            mana = intelligence * 5; // mana
+
+        }
+        //Классы для реализации
+        public void Knight(out double class_damage,out double class_critical,out double class_healthpoint,out double class_mana,out string class_name)
+        {
+            class_damage = damage*0.9 ;
+            class_critical = critical * 0.8;
+            class_healthpoint = healthpoint * 1.25;
+            class_mana = mana * 0.90;
+            class_name = "Рыцарь";
+        }
+        public void Rogue(out double class_damage, out double class_critical, out double class_healthpoint, out double class_mana,out string class_name)
+        {
+            class_damage = damage * 1.20;
+            class_critical = critical * 1.30;
+            class_healthpoint = healthpoint * 0.8;
+            class_mana = mana * 1;
+            class_name = "Разбойник";
+        }
+        //
+        public void ChoiceClass()
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Выберите ваш клас : (1 - Рыцарь ,2 - Разбойник)");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            int heroclass = Convert.ToInt32(Console.ReadLine());
+            switch (heroclass)
+            {
+                case 1:
+                    Knight(out damage, out critical, out healthpoint, out mana ,out classname);
+                    break;
+                case 2:
+                    Rogue(out damage, out critical, out healthpoint, out mana,out classname);
+                    break;
+            }
+        }
+        public void Show_All_Hero_Stats() // ВЫВОД ВСЕХ ХАРАКТЕРИСТИК ПЕРСОНАЖА
+        {
+            Console.Clear();
+            Console.WriteLine("Имя: {0}\n", hero_name);
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Ваш клас : {0}\n", classname);
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Осн. характеристики :\n");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Сила: {0}\n ", strength);
+            Console.WriteLine("Ловкость: {0}\n", agility);
+            Console.WriteLine("Интеллект: {0}\n", intelligence);
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Доп. характеристики\n");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Здоровье: {0}\n", healthpoint);
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("Мана: {0}\n", mana);
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Урон: {0}\n", damage);
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine("Крит: {0}\n", critical);
+        }
+
+    }
+    class Enemy
+    {
+        // ПЕРЕМЕННЫЕ
+        public string name_enemy;
+        public double hp_enemy;
+        public double damage_enemy;
+        // ПРОТИВНИКИ
+        public void Zombie(out double hp_enemy, out double damage_enemy, out string name_enemy)
+        {
+            name_enemy = "Зомби";
+            hp_enemy = 15.0;
+            damage_enemy = 3.0;
+        }
+        public void Skelete(out double hp_enemy, out double damage_enemy, out string name_enemy)
+        {
+            name_enemy = "Скелет";
+            hp_enemy = 20.0;
+            damage_enemy = 4.0;
+        }
+        public void Ghoul (out double hp_enemy, out double damage_enemy, out string name_enemy)
+        {
+            name_enemy = "Гуль";
+            hp_enemy = 30.0;
+            damage_enemy = 3.0;
+        }
+        public void ShadowShaman(out double hp_enemy, out double damage_enemy, out string name_enemy)
+        {
+            name_enemy = "Шаман теней";
+            hp_enemy = 15.0;
+            damage_enemy = 6.0;
+        }
+        //БОССЫ
+        public void TestBossOne(out double hp_enemy, out double damage_enemy, out string name_enemy)
+        {
+
+            name_enemy = "Однорукий Пират Северных Морей";
+            hp_enemy = 115.0;
+            damage_enemy = 10.0;
+        }
+    }
+    }
+    class Initialization
+    {
+        // ДОСТУП К ПЕРЕМЕННЫМ ИНИЦИАЛИЗАЦИЙ ИЗ КЛАССОВ
+        Hero my = new Hero();
+        Enemy enemy = new Enemy();
+        Random random = new Random();
+        Random hero_random = new Random();
+    //СЧЕТЧИК ДЛЯ ПОБЕД
+    public double win_counter;
+    // МЕТОДЫ
+    public void Open_Stats()
+        {
+        my.Main_Stats(out my.hero_name, out my.strength, out my.agility, out my.intelligence);
+        my.Additional_Stats(out my.damage, out my.critical, out my.healthpoint, out my.mana);
+        my.ChoiceClass();
+        my.Show_All_Hero_Stats();
+        }
+    public void Open_Enemy()
+        {
+            //КУБИК
+            int enemy_try = random.Next(1, 5);
+            Console.WriteLine("Протвник выбирает существо: ");    
+            switch (enemy_try)
+        {
+                case 1:
+            enemy.Zombie(out enemy.hp_enemy, out enemy.damage_enemy, out enemy.name_enemy);
+                    break;
+                case 2:
+            enemy.Skelete(out enemy.hp_enemy, out enemy.damage_enemy, out enemy.name_enemy);
+                    break;
+                case 3:
+            enemy.ShadowShaman(out enemy.hp_enemy, out enemy.damage_enemy, out enemy.name_enemy);
+                    break;
+                case 4:
+            enemy.Ghoul(out enemy.hp_enemy, out enemy.damage_enemy, out enemy.name_enemy);
+                    break;
+        }
+       
+    }
+    public void Boss_Fight()
+    {
+        Console.WriteLine("Спустя столько побед наш герой наконец дошел важной борьбы с злым пиратом");
+        Console.WriteLine("Ваш противник : ");
+    }
+    public void Fight()
+        {
+        double static_healthpoint = my.healthpoint;
+        double static_damage = my.damage;
+        double static_mana = my.mana;
+        //statgold
+        double hero_gold = 0;
+        //
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("\tБой начат");
+        Console.ForegroundColor = ConsoleColor.Gray;
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Ваш противник - {0} ",enemy.name_enemy);
+        Console.ForegroundColor = ConsoleColor.Gray;
+        while (my.healthpoint > 0)
+            {
+            while (enemy.hp_enemy > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                int enemy_try = random.Next(1, 25);
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("Противник бросил кубик на {0}", enemy_try);
+                Thread.Sleep(1500);
+                letstry:
+                int my_try = random.Next(1, 25);
+                Console.WriteLine("Вы бросили кубик на {0}", my_try);
+                Thread.Sleep(1500);
+                Console.ForegroundColor = ConsoleColor.Gray;
+                //FIGHT
+                if (my_try > enemy_try)
+                {
+                    switch (my_try)
+                    {
+                        //CRIT TRIGGER
+                        case 5:
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("Ныа! Крит! Отлетай Очередняра!");
+                            Console.ForegroundColor = ConsoleColor.Gray;
+                            my.damage = my.damage * (my.critical + 1);
+                            break;
+                        case 10:
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("Ныа! Крит! Отлетай Очередняра!");
+                            Console.ForegroundColor = ConsoleColor.Gray;
+                            my.damage = my.damage * (my.critical + 1);
+                            break;
+                        case 15:
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("Ныа! Крит! Отлетай Очередняра!");
+                            Console.ForegroundColor = ConsoleColor.Gray;
+                            my.damage = my.damage * (my.critical + 1);
+                            break;
+                        case 20:
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("Ныа! Крит! Отлетай Очередняра!");
+                            Console.ForegroundColor = ConsoleColor.Gray;
+                            my.damage = my.damage * (my.critical + 1);
+                            break;
+                        //ОСНОВНОЙ ДЕМЕДЖ
+                        default:
+                            enemy.hp_enemy = enemy.hp_enemy - my.damage;
+                            break;
+                    }
+                       //SPELL TRIGGER
+                       if (my.mana > 0)
+                    {
+                        switch (my_try)
+                        {
+                            case 16:
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("Вы использували 1 -й скилл");
+                                Console.ForegroundColor = ConsoleColor.Gray;
+                                my.healthpoint = my.healthpoint + (my.healthpoint * 1.25);
+                                //
+                                if (my.healthpoint < static_healthpoint)
+                                {
+                                    my.healthpoint = my.healthpoint + (my.healthpoint / 2);
+
+                                }
+                                if (my.healthpoint > static_healthpoint)
+                                {
+                                    my.healthpoint = static_healthpoint;
+                                }
+                                Thread.Sleep(1000);
+                                Console.WriteLine("Вы использували 2 -й скилл");
+                                Console.WriteLine("Вы успешно вылечились , у вас осталось {0}", my.healthpoint);
+                                my.mana = my.mana - my.intelligence;
+                                Console.WriteLine("Осталось маны {0}", my.mana);
+                                Thread.Sleep(1000);
+                                break;
+                            case 9:
+                                Console.ForegroundColor = ConsoleColor.DarkBlue;
+                                Console.WriteLine("Вы оглушили врага и можете походить еще раз ");
+                                Thread.Sleep(1000);
+                                my.mana = my.mana - my.intelligence;
+                                Console.WriteLine("Осталось маны {0}", my.mana);
+                                enemy_try = 0;
+                                goto letstry;
+                            case 13:
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("Вы использували 3 -й скилл");
+                                Console.ForegroundColor = ConsoleColor.Gray;
+                                Thread.Sleep(1000);
+                                enemy.hp_enemy = enemy.hp_enemy - (my.damage * 2);
+                                Console.WriteLine("Благодаря вашей ловкости вы нанесли удар дважды и у противника осталось {0} здоров'я", enemy.hp_enemy);
+                                my.mana = my.mana - my.intelligence;
+                                Console.WriteLine("Осталось маны {0}", my.mana);
+                                Thread.Sleep(1000);
+                                break;
+                        }
+                     
+                    }
+                    Console.ForegroundColor = ConsoleColor.Green;
+
+                    Console.WriteLine("{0} получает {1:0.##} урона от {2}, осталось {3:0.##} здоровья", enemy.name_enemy, my.damage, my.hero_name, enemy.hp_enemy);
+                    my.damage = static_damage;
+                    Thread.Sleep(1000);
+                    if (enemy.hp_enemy <= 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        win_counter++;
+                        Console.WriteLine("\tПобеда\n");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("Врагов повержено : {0} ",win_counter);
+                        Thread.Sleep(3000);
+                        if (my.healthpoint < static_healthpoint)
+                        {
+                            my.healthpoint = my.healthpoint + (my.healthpoint / 2);
+
+                        }
+                        if (my.healthpoint > static_healthpoint)
+                        {
+                            my.healthpoint = static_healthpoint;
+                        }
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        Thread.Sleep(1000);
+                        goto Next_Step;
+
+                    }
+                }
+                if (enemy_try > my_try)
+                {
+                    my.healthpoint = my.healthpoint - enemy.damage_enemy;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("{0} получает {1:0.##} урона от {2}, осталось {3:0.##} здоровья", my.hero_name, enemy.damage_enemy, enemy.name_enemy, my.healthpoint);
+                    Thread.Sleep(1000);
+                    if (my.healthpoint <= 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\tПоражение");
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        Thread.Sleep(1000);
+                        goto Lose;
+                    }
+                }
+            }
+            }
+            Next_Step:
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Обшаривает карманы...");
+         int my_trash = hero_random.Next(1, 50);
+        int enemy_trash = 1;
+       //  int enemy_trash = random.Next(1, 50);
+            if (my_trash > enemy_trash)
+            {
+            int random_stats = 6;
+               // int random_stats = hero_random.Next(1, 7);
+                switch (random_stats)
+                {
+                    case 1:
+                        Thread.Sleep(3000);
+                        Console.WriteLine("В останках {0}, Вы находите  элексир силы, выпив его вы получили +1 к Силе", enemy.name_enemy);
+                        Thread.Sleep(6000);
+                        my.strength++;
+                        break;
+                    case 2:
+                        Thread.Sleep(3000);
+                        Console.WriteLine("В останках {0}, Вы находите элексир ловкости, выпив его вы получили +1 к Ловкости", enemy.name_enemy);
+                        Thread.Sleep(6000);
+                        my.agility++;
+                        break;
+                    case 3:
+                        Thread.Sleep(3000);
+                        Console.WriteLine("В останках {0}, Вы находите элексир интелекта, выпив его вы получили +1 к Интеллекту", enemy.name_enemy);
+                        Thread.Sleep(6000);
+                        break;
+                    case 4:
+                        Thread.Sleep(3000);
+                        Console.WriteLine("Вы нашли небольшой мешочек золота из останков противника + 30 к вашему золоту");
+                        hero_gold= hero_gold + 30;
+                        Thread.Sleep(6000);
+                        break;
+                        case 5:
+                        Thread.Sleep(3000);
+                        Console.WriteLine("Вы нашли полный кошелек денег + 50 к вашему золоту");
+                        hero_gold = hero_gold + 50;
+                         Thread.Sleep(6000);
+                         break;
+                         case 6:
+                        Thread.Sleep(3000);
+                        Console.WriteLine("Вы нашли палец Мидаса + 100 к вашему золоту");
+                        hero_gold = hero_gold + 100;
+                        Thread.Sleep(6000);
+                        break;
+            }
+         
+                // отправка на перерасчет коофициентов после бонусса
+                //   my.Additional_Stats(out my.damage, out my.critical, out my.healthpoint, out my.mana);
+                // вывод новых характеристик    
+                my.Show_All_Hero_Stats();
+                Thread.Sleep(3000);
+            }
+            else
+            {
+                Thread.Sleep(3000);
+                Console.WriteLine("В останках вам не удалось ничего найти...");
+            }
+
+            Thread.Sleep(2000);
+            Console.ForegroundColor = ConsoleColor.Yellow;
+       PrevShop:
+        Console.WriteLine("Хотите ли вы продолжить чистить нечисть или вам нужно в магазин?\n(1- Продлжить бой\n2- Магазин)");
+            Console.Write("> ");
+            int next_step = Convert.ToInt32(Console.ReadLine());
+        switch (next_step)
+        {
+            case 1:
+                case1:
+                Open_Enemy();
+                Fight();
+                break;
+            case 2:
+                if(hero_gold==0&&hero_gold<30)
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("У вас нету золота ,выбивайте деньги дальше\n");
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    Thread.Sleep(3000);
+                    goto case1;
+                }
+                goto Shop;
+        }
+        ///shop
+        Shop:
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("Вечер в хату,добро пожаловать в магазин 'Кинь себе палку сам'\n");
+        Console.ForegroundColor = ConsoleColor.Gray;
+        ContinueShoping:
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("Ваше золото :{0}\n",hero_gold);
+        Console.ForegroundColor = ConsoleColor.Gray;
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine("Чего желаете сэр {0}",my.hero_name);
+        Console.ForegroundColor = ConsoleColor.Gray;
+        Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("1. Золотое кадило (+3 урона) - 30 голды");
+            Console.WriteLine("2. Титановые кости предков (+3 хп) - 30 голды");
+            Console.WriteLine("3. Восковые фигруки Вуду (+3 маны) - 30 голды");
+            Console.WriteLine("4. Благословение Патриарха Кирилла  (+2% критшансы) - 50 голды");
+            Console.WriteLine("5. Восстановление очков жизни- 50 голды");
+        int shopchoice = Convert.ToInt32(Console.ReadLine());
+        switch(shopchoice)
+        {
+            case 1:
+                if (hero_gold <30)
+                {
+                    Console.WriteLine("У вас недостаточно золота ,выберите что-то другое!");
+                    goto PrevShop;
+                }
+                Console.WriteLine("Поздравляем с покупкой!\nЖдем вас в следующий раз");
+                hero_gold = hero_gold - 30;
+                my.damage = my.damage + 3;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Ваш урон после покупки : {0} ",my.damage);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Не хотите ли купить что-нибудь еще?(1 -Да,2- Нет");
+                int continue_shoping = Convert.ToInt32(Console.ReadLine());
+                switch(continue_shoping)
+                {
+                    case 1:
+                        goto ContinueShoping;
+                    case 2:
+                        break;
+                }
+                Console.WriteLine("\nЖдем вас в следующий раз");
+                Console.Clear();
+                my.Show_All_Hero_Stats();
+                Open_Enemy();
+                Fight();
+                break;
+            case 2:
+                if (hero_gold < 30)
+                {
+                    Console.WriteLine("У вас недостаточно золота ,выберите что-то другое!");
+                    goto PrevShop;
+                }
+                Console.WriteLine("Поздравляем с покупкой!\nЖдем вас в следующий раз");
+                hero_gold = hero_gold - 30;
+                my.healthpoint = my.healthpoint + 3;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Ваше здоровь'е после покупки : {0} ", my.healthpoint);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Не хотите ли купить что-нибудь еще?(1 -Да,2- Нет");
+                 continue_shoping = Convert.ToInt32(Console.ReadLine());
+                switch (continue_shoping)
+                {
+                    case 1:
+                        goto ContinueShoping;
+                    case 2:
+                        break;
+                }
+                Console.WriteLine("\nЖдем вас в следующий раз");
+                Console.Clear();
+                my.Show_All_Hero_Stats();
+                Open_Enemy();
+                Fight();
+                break;
+            case 3:
+                if (hero_gold < 30)
+                {
+                    Console.WriteLine("У вас недостаточно золота ,выберите что-то другое!");
+                    goto PrevShop;
+                }
+                Console.WriteLine("Поздравляем с покупкой!\nЖдем вас в следующий раз");
+                my.mana = my.mana + 3;
+                hero_gold = hero_gold - 30;
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine("Ваша мана  после покупки : {0} ", my.mana);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Не хотите ли купить что-нибудь еще?(1 -Да,2- Нет");
+                continue_shoping = Convert.ToInt32(Console.ReadLine());
+                switch (continue_shoping)
+                {
+                    case 1:
+                        goto ContinueShoping;
+                    case 2:
+                        break;
+                }
+                Console.WriteLine("\nЖдем вас в следующий раз");
+                Console.Clear();
+                my.Show_All_Hero_Stats();
+                Open_Enemy();
+                Fight();
+                break;
+            case 4:
+                if (hero_gold < 50)
+                {
+                    Console.WriteLine("У вас недостаточно золота ,выберите что-то другое!");
+                    goto PrevShop;
+                }
+                Console.WriteLine("Поздравляем с покупкой!\nЖдем вас в следующий раз");
+                hero_gold = hero_gold - 50;
+                my.critical = my.critical + 2;
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("Ваш крит после покупки : {0} ", my.critical);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Не хотите ли купить что-нибудь еще?(1 -Да,2- Нет");
+                continue_shoping = Convert.ToInt32(Console.ReadLine());
+                switch (continue_shoping)
+                {
+                    case 1:
+                        goto ContinueShoping;
+                    case 2:
+                        break;
+                }
+                Console.WriteLine("\nЖдем вас в следующий раз");
+                Console.Clear();
+                my.Show_All_Hero_Stats();
+                Open_Enemy();
+                Fight();
+                break;
+            case 5:
+                if (hero_gold < 50)
+                {
+                    Console.WriteLine("У вас недостаточно золота ,выберите что-то другое!");
+                    goto PrevShop;
+                }
+                hero_gold = hero_gold - 50;
+                my.healthpoint = static_healthpoint;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Вы полечились и у вас осталось : {0} здоровь'я",my.healthpoint);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Не хотите ли купить что-нибудь еще?(1 -Да,2- Нет");
+                continue_shoping = Convert.ToInt32(Console.ReadLine());
+                switch (continue_shoping)
+                {
+                    case 1:
+                        goto ContinueShoping;
+                    case 2:
+                        break;
+                }
+                Console.Clear();
+                my.Show_All_Hero_Stats();
+                Open_Enemy();
+                Fight();    
+                break;
+            default:
+                Console.WriteLine("К сожалению у нас нет такого товара в наличии ,выберите что нибудь другое");
+                goto ContinueShoping;
+        }
+
+        ///LOSSSS
+        Lose:
+            Console.Clear();
+            Thread.Sleep(1000);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Ваш путь был тяжел и тернист...");
+            Thread.Sleep(3000);
+            Console.WriteLine("Ваше имя {0}, будет выбито на камне в Аллее Героев,", my.hero_name);
+            Thread.Sleep(3000);
+            Console.WriteLine("Дабы все знали кем был совершен этот подвиг...");
+            Thread.Sleep(3000);
+            Console.WriteLine("Врагов повержено {0} ", win_counter);
+        Console.ReadKey();
+        }
+    }
+        
+`
